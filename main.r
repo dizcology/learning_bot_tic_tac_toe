@@ -32,4 +32,5 @@ dim(learn_matrix)
 
 ##  after match with human learn with higher weight:
 ##  learn_matrix=learn(wt=2)
+##  TODO: allow varying weight  
 
