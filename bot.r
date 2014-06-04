@@ -3,6 +3,8 @@
 train = function(n=100,mat=learn_matrix, players=c("s","s")){
   count=0 #to avoid unending loop!
   lmat=mat
+  win_count=rep(0,2)
+  names(win_count)=paste0(players,1:2)
   
   for(i in 1:n){
     count=count+1
@@ -17,9 +19,11 @@ train = function(n=100,mat=learn_matrix, players=c("s","s")){
       game=generate(show=FALSE, players=players)
       winner=game$winner
     }
-    
+    win_count[(3-winner)/2]=win_count[(3-winner)/2]+1
     lmat=learn(game=game, mat=lmat)
   }
+  
+  print(win_count)
   reset()
   return(lmat)
 }
@@ -54,7 +58,6 @@ learn = function(game=list(records=rcd,winner=judge()$winner), mat=learn_matrix,
     
   }
   
-
   reset()
 
   return(rbind(lmat,temp))
@@ -62,7 +65,6 @@ learn = function(game=list(records=rcd,winner=judge()$winner), mat=learn_matrix,
 
 botmove = function(show=TRUE){
   m=NA
-  n_guess=0
   
   for (t in 1:dim(learn_matrix)[1]){
     if (all(conf==learn_matrix[t,]$conf)){
@@ -83,12 +85,9 @@ botmove = function(show=TRUE){
     if (length(which(conf==0))==1){
       m=which(conf==0)
     } else{
-      n_guess=n_guess+1
+
       m=sample(which(conf==0),1)
     }
-  }
-  if (n_guess>0){
-    print(paste0("guess count=",n_guess))
   }
   if (show==TRUE){
     print(lm_search())

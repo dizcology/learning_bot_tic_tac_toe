@@ -40,6 +40,7 @@ find_check = function(){
 
 find_chance = function(){
   check=NULL
+  check1=NULL
   m=matrix(conf,3,3)
   v=apply(m,1,sum)
   w=apply(m,2,sum)
@@ -107,7 +108,7 @@ find_chance = function(){
   }
   
   
-  return(unique(check))
+  return(check)
 }
 
 
@@ -136,7 +137,7 @@ sbotmove = function(show=TRUE){
     m=sample(which(conf==0),1)
   }
   if (show==TRUE){
-    print(paste(ck,",",ch))
+    print(paste(ck,ch))
   }
   return(m)
 }

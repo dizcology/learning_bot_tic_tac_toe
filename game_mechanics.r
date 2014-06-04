@@ -58,6 +58,7 @@ reset = function(){
   conf <<- rep(0,9)
   turn <<- 1
   rcd <<- NULL
+
 }
 
 
