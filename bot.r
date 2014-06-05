@@ -3,8 +3,8 @@
 train = function(n=100,mat=learn_matrix, players=c("s","s")){
   count=0 #to avoid unending loop!
   lmat=mat
-  win_count=rep(0,2)
-  names(win_count)=paste0(players,1:2)
+  win_count=rep(0,3)
+  names(win_count)=c(paste0(players,1:2),"tie")
   
   for(i in 1:n){
     count=count+1
@@ -18,6 +18,9 @@ train = function(n=100,mat=learn_matrix, players=c("s","s")){
     while (winner==0){
       game=generate(show=FALSE, players=players)
       winner=game$winner
+      if (winner==0){
+        win_count[3]=win_count[3]+1
+      }
     }
     win_count[(3-winner)/2]=win_count[(3-winner)/2]+1
     lmat=learn(game=game, mat=lmat)
