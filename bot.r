@@ -1,22 +1,25 @@
 
 
-train = function(n=100,mat=learn_matrix, players=c("s","s")){
+train = function(n=100,mat=learn_matrix, players=c("s","s"),cut=500){
+  reset()
   count=0 #to avoid unending loop!
   lmat=mat
   win_count=rep(0,3)
   names(win_count)=c(paste0(players,1:2),"tie")
   
   for(i in 1:n){
-    count=count+1
-    if (count>1000){
-      print ("1000 game played")
-      print (paste(i,"games without tie"))
-      return(lmat)
-    }
-    
     winner=0
     while (winner==0){
       game=generate(show=FALSE, players=players)
+      
+      count=count+1
+      if (count>cut){
+        print (paste0(cut," games played"))
+        print (paste0(i," games without tie"))
+        reset()
+        return(lmat)
+      }
+        
       winner=game$winner
       if (winner==0){
         win_count[3]=win_count[3]+1
@@ -112,3 +115,31 @@ lm_search = function(c=conf){
   return(r)
 }
 
+write.lm = function(lmat=learn_matrix,file="learn_matrix.dat"){
+  write.table(t(apply(lmat,1,unlist)),file=file,row.names=F,col.names=F)
+}
+
+read.lm = function(file="learn_matrix.dat"){
+  lmat=NULL
+  tmp=read.table(file=file)
+  colnames(tmp)=c(1:9,1:9)
+  for (i in 1:dim(tmp)[1]){
+    rw=c(list(conf=as.numeric(tmp[i,1:9])),as.list(tmp[i,10:18]))
+    lmat=rbind(lmat,rw)
+  }
+  
+  colnames(lmat)=c("conf",as.character(1:9))
+  rownames(lmat)=NULL
+  return(lmat)
+}
+
+stat.lm = function(lmat=learn_matrix){
+  print (paste0("Configurations observed: ",dim(lmat)[1]))
+  mm=unlist(as.matrix(lmat[1:dim(lmat)[1],2:10]))
+  idx=sum(abs(mm))
+  
+  print (paste0("Learn index: ",idx))
+  #rng=range(lmat[2:dim(lmat)[1],2:10])
+  #print (paste0("Range: ",rng[1],"~",rng[2]))
+  
+}
