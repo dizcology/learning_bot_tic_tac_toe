@@ -1,3 +1,5 @@
+learn_matrix=matrix(c(list(conf=rep(0,9)),rep(list(0),9)),1,10)
+colnames(learn_matrix)=c("conf",as.character(1:9))
 
 
 train = function(n=100,mat=learn_matrix, players=c("s","s"),cut=500){
@@ -16,6 +18,7 @@ train = function(n=100,mat=learn_matrix, players=c("s","s"),cut=500){
       if (count>cut){
         print (paste0(cut," games played"))
         print (paste0(i," games without tie"))
+        print(win_count)
         reset()
         return(lmat)
       }

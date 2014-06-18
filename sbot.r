@@ -1,5 +1,3 @@
-
-
 find_check = function(){
   check=NULL
   m=matrix(conf,3,3)

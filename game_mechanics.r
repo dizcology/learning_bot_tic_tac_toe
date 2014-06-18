@@ -72,6 +72,10 @@ generate = function(show=TRUE, show_each=FALSE, players=c("s","s")){
   for (i in 1:length(players)){
     if (players[i]=="m"){
       v[[i]]=botmove
+    } else if (players[i]=="n") {
+      v[[i]]=nbotmove
+    } else if (players[i]=="r") {
+      v[[i]]=rbotmove
     } else {
       v[[i]]=sbotmove
     }
@@ -94,7 +98,25 @@ generate = function(show=TRUE, show_each=FALSE, players=c("s","s")){
   return(list(records=rcd,winner=winner))
 }
 
+ssample = function(v){
+  m=NA
+  if (length(v)==1){
+    m=v
+  } else {
+    m=sample(v,1)
+  }
+  return(m)
 
+}
+
+taken = function(v){
+  return(sum(abs(v)))
+
+}
+
+rbotmove = function(show=TRUE){
+  return(ssample(which(conf==0)))
+}
 
 
 
