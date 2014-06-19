@@ -1,7 +1,7 @@
-default_alpha=0.001
-default_threshold=0.01*default_alpha
+search_interval=c(-300,300)
+default_threshold=0.001
 
-default_lambda=0 #0.01
+default_lambda=0
 
 nn.initialize = function(n_nodes=c(1,1),mean=0,sd=0.1,fct=1){
   n_layers=length(n_nodes)
@@ -60,7 +60,7 @@ nn.backward = function(nn,x,y,f=nn.sigmoid){
   return(grd)
 }
 
-nn.learn = function(nn,xx,yy,alpha=default_alpha,lambda=default_lambda,f=nn.sigmoid,method="batch",bsize=10){
+nn.learn = function(nn,xx,yy,lambda=default_lambda,f=nn.sigmoid,method="batch",bsize=10){
 
   n_layers=length(nn$n_nodes)
   
@@ -86,16 +86,15 @@ nn.learn = function(nn,xx,yy,alpha=default_alpha,lambda=default_lambda,f=nn.sigm
     th=default_threshold
   }
   
-  mm=grad.desc(nn,x,y,alphagd=alpha,lambdagd=lambda,f=nn.sigmoid,threshold=th,batch_size=bsize)
+  mm=grad.desc(nn,x,y,lambdagd=lambda,f=nn.sigmoid,threshold=th,batch_size=bsize)
   
   return(mm)
 }
 
-grad.desc = function(nn,x,y,alphagd=default_alpha,lambdagd=default_lambda,f=nn.sigmoid,threshold=default_threshold,batch_size=10){  
+grad.desc = function(nn,x,y,lambdagd=default_lambda,f=nn.sigmoid,threshold=default_threshold,batch_size=10){  
 
   mm=nn
   mm_temp=mm
-  mm_d=mm
   
   cost=cost(nn,x,y,lambdagd)
   print(paste("initial cost:",cost))
@@ -117,8 +116,7 @@ grad.desc = function(nn,x,y,alphagd=default_alpha,lambdagd=default_lambda,f=nn.s
     }
   
   } else {    
-    #while (mean_size(mm_d)>=threshold) {
-    while (cost_temp<=cost && abs(cost_temp-cost)>=default_alpha*cost/10) {#TODO: dynamic step size alpha 
+    while (cost_temp<=cost && abs(cost-cost_temp)>=threshold*cost) {
       mm_d=nn.initialize(n_nodes=nn$n_nodes,fct=0)
 
       mm=mm_temp
@@ -130,15 +128,22 @@ grad.desc = function(nn,x,y,alphagd=default_alpha,lambdagd=default_lambda,f=nn.s
         grd=nn.backward(mm,x[,i],y[,i],f)
         
         for (i in 1:(n_layers-1)){
-          mm_d$theta[[i]]=mm_d$theta[[i]]+(alphagd*grd[[i]])/n_data
+          mm_d$theta[[i]]=mm_d$theta[[i]]+grd[[i]]/n_data
           
         }
 
       }
       
       for (i in 1:(n_layers-1)){
-        mm_temp$theta[[i]]=mm_temp$theta[[i]]-mm_d$theta[[i]]-alphagd*lambdagd*(mm_temp$theta[[i]]%*%diag(c(rep(1,mm_temp$n_nodes[i]),0)))
+        mm_d$theta[[i]]=mm_d$theta[[i]]+lambdagd*(mm$theta[[i]]%*%diag(c(rep(1,mm$n_nodes[i]),0)))
       }
+       
+      obj = function(t){
+        return(cost(add(mm,mult(mm_d,t)),x,y,lambdagd))
+      }
+      
+      alpha=optimize(f=obj,interval=search_interval)$minimum
+      mm_temp=add(mm,mult(mm_d,alpha))
       
       cost_temp=cost(mm_temp,x,y,lambdagd)
       #print(cost_temp)
@@ -147,6 +152,7 @@ grad.desc = function(nn,x,y,alphagd=default_alpha,lambdagd=default_lambda,f=nn.s
   }
   
   print(paste("->final cost:", cost))
+  print(paste("iterations:",count))
   #print(paste("number of iterations:",count))
   return(mm)
 
@@ -178,7 +184,29 @@ mean_distance = function(n,m){
   return(d)
 }
 
-cost = function(nn,x,y,lambda){
+
+add = function(n,m){
+  if (!all(m$n_nodes==n$n_nodes)){
+    print ("incompatible neural networks")
+  }
+  
+  s=m
+  
+  for (i in 1:length(m$theta)){
+    s$theta[[i]]=m$theta[[i]]+n$theta[[i]]
+  }
+  return(s)
+}
+
+mult = function(n,r){
+  m=n
+  for (i in 1:length(n$theta)){
+    m$theta[[i]]=r*m$theta[[i]]
+  }
+  return(m)
+}
+
+cost = function(nn,x,y,lambda=default_lambda){
   c=0
   s=0
   n_data=dim(x)[2]
@@ -191,43 +219,4 @@ cost = function(nn,x,y,lambda){
   c=c/n_data
   s=lambda*s/2
   return(c+s)
-}
-
-if(FALSE){
-#testing0:
-
-n_data=10
-nnds=c(2,1)
-y0=0
-x0=c(1,0)
-y1=matrix(y0+rnorm(n_data*length(y0),mean=0,sd=0.01),nnds[2])
-x1=matrix(x0+rnorm(n_data*length(x0),mean=0,sd=0.01),nnds[1])
-newnn0=nn.initialize(nnds,mean=0,sd=1)
-newnn0
-nn.forward(newnn0,x0)$y
-newnn0=nn.learn(newnn0,x1,y1,lambda=default_lambda)
-newnn0
-nn.forward(newnn0,x0)$y
-
-#testing: 
-
-yand=t(as.matrix(c(1,0,0,0)))
-yor=t(as.matrix(c(1,1,1,0)))
-yxor=t(as.matrix(c(0,1,1,0)))
-ynxor=t(as.matrix(c(1,0,0,1)))
-
-
-n_data=3
-nnds=c(2,1)
-y=yand
-x=rbind(c(1,1,0,0),c(1,0,1,0))
-yy=matrix(as.numeric(y)+rnorm(n_data*length(y),mean=0,sd=0.1),nnds[2])
-xx=matrix(as.numeric(x)+rnorm(n_data*length(x),mean=0,sd=0.1),nnds[1])
-newnn=nn.initialize(nnds,mean=0,sd=1)
-newnn
-for (i in 1:dim(x)[2]){print(nn.forward(newnn,x[,i])$y)}
-newnn=nn.learn(newnn,xx,yy,lambda=default_lambda)
-newnn
-for (i in 1:dim(x)[2]){print(nn.forward(newnn,x[,i])$y)}
-
 }

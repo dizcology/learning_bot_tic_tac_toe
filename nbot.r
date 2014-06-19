@@ -1,8 +1,7 @@
-h=3
+h=NULL
 n_nodes=c(9,h,9)
 botnn=nn.initialize(n_nodes=n_nodes, mean=0, sd=0.01)
-alp=1
-lamb=0.000001
+lamb=0.001
 
 
 
@@ -29,7 +28,7 @@ ntrain = function(n=100,nn, players=c("s","s")){
     xa=cbind(xa,nsh$x)
     ya=cbind(ya,nsh$y)
   }
-  mm=nlearn(nnl=nn, x=xa, y=ya, alph=alp, lambd=lamb)
+  mm=nlearn(nnl=nn, x=xa, y=ya, lambd=lamb)
   print(win_count)
   reset()
   return(mm)
@@ -41,7 +40,7 @@ nshape = function(g){
   id=diag(rep(1,9))
   
   x1=matrix(unlist(records[,1]),9)
-  y1=matrix(1/5,9,dim(records)[1]) # entirely arbitrary choice of weight for moves that result in a tie
+  y1=matrix(0.5,9,dim(records)[1]) # entirely arbitrary choice of weight for moves that result in a tie
   
   for (i in 1:dim(y1)[2]){
     if (winner*(-1)*(-1)^i==1){ #means the i-th move is a winning move
@@ -56,9 +55,9 @@ nshape = function(g){
   return(list(x=x1,y=y1))
 }
 
-nlearn = function(nnl,x,y, alph=alp,lambd=lamb){
+nlearn = function(nnl,x,y,lambd=lamb){
   
-  mm=nn.learn(nnl,xx=x,yy=y,alpha=alph,lambda=lambd)
+  mm=nn.learn(nnl,xx=x,yy=y,lambda=lambd)
   reset()
 
   return(mm)

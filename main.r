@@ -17,8 +17,8 @@ rcd=NULL
 ## neural network bot:
 ###############
 
-#botnn=ntrain(n=500,nn=botnn, players=c("m","m"))
-botnn=ntrain(n=100,nn=botnn,players=c("s","r")) 
+
+botnn=ntrain(n=200,nn=botnn,players=c("s","r")) 
 
 ###############
 ## frequentist bot:
