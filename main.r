@@ -18,7 +18,7 @@ rcd=NULL
 ###############
 
 
-botnn=ntrain(n=200,nn=botnn,players=c("s","r")) 
+botnn=ntrain(n=1000,nn=botnn,players=c("s","r")) 
 
 ###############
 ## frequentist bot:

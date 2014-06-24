@@ -1,7 +1,7 @@
-h=NULL
+h=c(9)
 n_nodes=c(9,h,9)
 botnn=nn.initialize(n_nodes=n_nodes, mean=0, sd=0.01)
-lamb=0.001
+lamb=0
 
 
 
@@ -28,6 +28,8 @@ ntrain = function(n=100,nn, players=c("s","s")){
     xa=cbind(xa,nsh$x)
     ya=cbind(ya,nsh$y)
   }
+  xa=xa+rnorm(length(xa),sd=0.1)
+  ya=ya+rnorm(length(xa),sd=0.1)
   mm=nlearn(nnl=nn, x=xa, y=ya, lambd=lamb)
   print(win_count)
   reset()

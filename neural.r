@@ -1,3 +1,5 @@
+library(ggplot2)
+
 search_interval=c(-300,300)
 default_threshold=0.001
 
@@ -60,7 +62,7 @@ nn.backward = function(nn,x,y,f=nn.sigmoid){
   return(grd)
 }
 
-nn.learn = function(nn,xx,yy,lambda=default_lambda,f=nn.sigmoid,method="batch",bsize=10){
+nn.learn = function(nn,xx,yy,lambda=default_lambda,f=nn.sigmoid,method="batch",bsize=10, visualize=FALSE){
 
   n_layers=length(nn$n_nodes)
   
@@ -86,12 +88,12 @@ nn.learn = function(nn,xx,yy,lambda=default_lambda,f=nn.sigmoid,method="batch",b
     th=default_threshold
   }
   
-  mm=grad.desc(nn,x,y,lambdagd=lambda,f=nn.sigmoid,threshold=th,batch_size=bsize)
+  mm=grad.desc(nn,x,y,lambdagd=lambda,f=nn.sigmoid,threshold=th,batch_size=bsize,vis=visualize)
   
   return(mm)
 }
 
-grad.desc = function(nn,x,y,lambdagd=default_lambda,f=nn.sigmoid,threshold=default_threshold,batch_size=10){  
+grad.desc = function(nn,x,y,lambdagd=default_lambda,f=nn.sigmoid,threshold=default_threshold,batch_size=10,vis=FALSE){  
 
   mm=nn
   mm_temp=mm
@@ -117,6 +119,7 @@ grad.desc = function(nn,x,y,lambdagd=default_lambda,f=nn.sigmoid,threshold=defau
   
   } else {    
     while (cost_temp<=cost && abs(cost-cost_temp)>=threshold*cost) {
+    
       mm_d=nn.initialize(n_nodes=nn$n_nodes,fct=0)
 
       mm=mm_temp
@@ -144,6 +147,10 @@ grad.desc = function(nn,x,y,lambdagd=default_lambda,f=nn.sigmoid,threshold=defau
       
       alpha=optimize(f=obj,interval=search_interval)$minimum
       mm_temp=add(mm,mult(mm_d,alpha))
+      
+      if (vis){
+        print(visualize(mm_temp))
+      }
       
       cost_temp=cost(mm_temp,x,y,lambdagd)
       #print(cost_temp)
@@ -219,4 +226,23 @@ cost = function(nn,x,y,lambda=default_lambda){
   c=c/n_data
   s=lambda*s/2
   return(c+s)
+}
+ 
+visualize = function(nn,z=0.5,rng=c(-2,2),step=0.1, output=1){ #when nn has exactly two input nodes; by default shows the first output node
+
+  if (nn$n_nodes[1]!=2){
+    print("Error: Number of input nodes not equal to 2.")
+    return(NULL)
+  }
+  
+  v=seq(rng[1],rng[2],step)
+  pairs=expand.grid(v,v)
+  f = function(w){
+    nn.forward(nn,w)$y[output]
+  }
+  triples=cbind(pairs,apply(pairs,1,f))
+  ddf=as.data.frame(triples)
+  colnames(ddf)=c("x","y","z")
+  ggplot(ddf,aes(x,y,fill=z))+geom_tile()+scale_fill_gradient(low="black",high="white")
+  
 }
