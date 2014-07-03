@@ -20,7 +20,7 @@ ox = function(v){
   return(w)
 }
 
-board = function(){
+board = function(cnf=conf){
     
   m=matrix(ox(conf),3,3)
   rownames(m)=1:3
@@ -29,8 +29,8 @@ board = function(){
 
 }
 
-status = function(){
+status = function(cnf=conf){
   print(paste("current turn:",ox(turn)))
-  return(board())
+  return(board(cnf))
 }
 

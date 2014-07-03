@@ -28,8 +28,8 @@ play = function(m,show=TRUE){
 
 
 
-judge = function(){
-  m=matrix(conf,3,3)
+judge = function(cnf=conf){
+  m=matrix(cnf,3,3)
   v=apply(m,1,sum)
   w=apply(m,2,sum)
   s=m[1,1]+m[2,2]+m[3,3]
@@ -74,10 +74,10 @@ generate = function(show=TRUE, show_each=FALSE, players=c("s","s")){
       v[[i]]=botmove
     } else if (players[i]=="n") {
       v[[i]]=nbotmove
-    } else if (players[i]=="r") {
-      v[[i]]=rbotmove
+    } else if (players[i]=="b") {
+      v[[i]]=bbotmove
     } else {
-      v[[i]]=sbotmove
+      v[[i]]=rbotmove
     }
   }
   
@@ -88,8 +88,8 @@ generate = function(show=TRUE, show_each=FALSE, players=c("s","s")){
     
     #records=rbind(records,list(conf=conf,move=m))
     play(m, show=show_each)
-    fnshed=judge()$finished
-    winner=judge()$winner
+    fnshed=judge(conf)$finished
+    winner=judge(conf)$winner
   }
   
   if (show==TRUE){
@@ -112,10 +112,6 @@ ssample = function(v){
 taken = function(v){
   return(sum(abs(v)))
 
-}
-
-rbotmove = function(show=TRUE){
-  return(ssample(which(conf==0)))
 }
 
 

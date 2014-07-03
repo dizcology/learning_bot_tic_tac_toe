@@ -65,7 +65,7 @@ nlearn = function(nnl,x,y,lambd=lamb){
   return(mm)
 }
 
-nbotmove = function(show=TRUE){
+nbotmove = function(conf=conf, show=TRUE){
   w=1-abs(conf)
   v=nn.forward(botnn,conf)$y*w
   m=ssample(which(v==max(v)))
