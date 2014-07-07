@@ -1,7 +1,7 @@
 library(ggplot2)
 
 search_interval=c(-300,300)
-default_threshold=0.001
+default_threshold=0.00005
 
 default_lambda=0
 
