@@ -1,7 +1,7 @@
 library(ggplot2)
 
 search_interval=c(-300,300)
-default_threshold=0.00005
+default_threshold=0.001
 
 default_lambda=0
 
@@ -228,7 +228,7 @@ cost = function(nn,x,y,lambda=default_lambda){
   return(c+s)
 }
  
-visualize = function(nn,z=0.5,rng=c(-2,2),step=0.1, output=1){ #when nn has exactly two input nodes; by default shows the first output node
+visualize = function(nn,z=0.5,rng=c(-1,2),step=0.1, output=1){ #when nn has exactly two input nodes; by default shows the first output node
 
   if (nn$n_nodes[1]!=2){
     print("Error: Number of input nodes not equal to 2.")
@@ -243,6 +243,6 @@ visualize = function(nn,z=0.5,rng=c(-2,2),step=0.1, output=1){ #when nn has exac
   triples=cbind(pairs,apply(pairs,1,f))
   ddf=as.data.frame(triples)
   colnames(ddf)=c("x","y","z")
-  ggplot(ddf,aes(x,y,fill=z))+geom_tile()+scale_fill_gradient(low="black",high="white")
+  ggplot(ddf,aes(x,y,fill=z))+geom_tile()+scale_fill_gradient(low="white",high="black")
   
 }

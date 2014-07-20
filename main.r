@@ -6,6 +6,7 @@ source("neural.r")
 source("nbot.r")
 source("rbot.r")
 source("bbot.r")
+source("mnbot.r")
 
 conf=rep(0,9)
 turn=1
@@ -19,7 +20,7 @@ rcd=NULL
 ###############
 
 
-botnn=ntrain(n=100,nn=botnn,players=c("b","b")) 
+botnn=ntrain(n=1000,nn=botnn,players=c("r","r")) 
 
 ###############
 ## frequentist bot:

@@ -1,4 +1,4 @@
-h=c(9)
+h=c(50)
 n_nodes=c(9,h,9)
 botnn=nn.initialize(n_nodes=n_nodes, mean=0, sd=0.01)
 lamb=0
